@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <malloc.h>
 #include <unistd.h>
 #include <assert.h>
 #include "wc.h"
