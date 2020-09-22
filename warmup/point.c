@@ -1,6 +1,9 @@
 // Owner: Mithun Jothiravi
 // Class: ECE 344 (OS)
+/* Description: C code can be across multiple source files. Typically, a header file (e.g., "foo.h") describes the procedures and variables exported by a source file (e.g., "foo.c"). Each .c file is typically compiled into an object file (e.g., "foo.o" and "bar.o") and then all object files are linked together into one executable.
 
+We have provided point.h, which defines a type and structure for storing a point's position in 2D space, and which defines the interface to a translate function to move the point to a new location, to determine the distance between points, and to compare points. Your job is to implement these functions in point.c so that the test program test_point.c works. Do not modify the point.h header file or the test_point.c program file.
+ */
 #include <assert.h>
 #include <math.h>
 #include "common.h"
