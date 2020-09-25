@@ -46,7 +46,7 @@ int main( int argc, char *argv[] )
 		printf("Overflow\n");
 	}
 	else {
-		printf("Huh?\n"); // Default error message.
+		printf("Huh\?\n"); // Default error message.
 	}
 
 	return 0;
