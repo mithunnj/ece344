@@ -39,7 +39,7 @@ int main( int argc, char *argv[] )
 			index = calc_fact(index);
 		}
 
-		printf("%d", FACTORIAL_RESULT);
+		printf("%d\n", FACTORIAL_RESULT);
 		
 	}
 	else if (user_int > 12) { // User input is too large for factorial processing.
