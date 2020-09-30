@@ -1,0 +1,18 @@
+Hello world
+how
+many
+words
+362880
+479001600
+Huh?
+Huh?
+Overflow
+Huh?
+OK
+test_wc produced the wrong output.
+see wc-small.out
+./run_big_test_wc: line 17:  7343 Segmentation fault      ./test_wc $SRC_PATH/wc-big.txt > wc.out
+test_wc produced the wrong output.
+OK
+OK
+OK
