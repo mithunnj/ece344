@@ -1,0 +1,31 @@
+==+== ECE344 Quiz 1
+==+==
+==+== DO NOT CHANGE LINES THAT START WITH "==+=="!
+==+== Write your answers starting on the blank line below each section.
+==+==
+==+== Answer 01   
+1) printf() provides abstraction to the user program by handling the details of printing to the console, including making the necessary write() system calls. 
+2) printf() is a library function that can be called in a program (user-level process), therefore it runs in user mode.
+write() is a system call that requires higher priviledges to run, therefore it runs in kernel mode.
+3) printf() runs in user mode, so doesn't have direct access to devices (which require system calls). 
+write() requires higher priviledges (kernel mode), the system call can directly access hardware.
+4) printf() can be called in a program in user level mode.
+write() requires a trap instruction to jump into a specific location in the kernel code to execute, to run the system call handler.
+5) printf() would be located in the address space allocated for the process it is part of.
+write() would be located in the address space allocated for the OS. This is where all the system call code would be stored. 
+
+==+== Answer 02
+1) CPU modes: This sandboxes user-level processes from making more priviledged kernel mode access to modify OS code. 
+2) Memory protection: Write instructions to kernel code can not happen from a user process unless it is through Trap instructions. However, Trap instructions provide a gated entry point to kernel mode by specifying a specific location in the kernel code. Therefore, there is control as to what part of the kernel the user can gain access to. 
+3) Interrupts/Exceptions: When programs (running in user mode) calls privileged instructions (to modify the kernel code), the processor will not run the instruction. Instead the CPU will generate an Exception, which causes the CPU to switch to kernel mode, and the OS will then regain control. This will stop a user process from making malicious changes to the kernel.
+
+==+== Answer 03
+a) A thread runs one or more functions on a single stack, which means that it requires sequential execution of instructions. The instructions can possibly run out of order if you split the thread over multiple CPUs. When a function call is made (f2) from the main function (main), main cannot proceed until f2 returns. Additionally, each core has it's own MMU with virtual address space, so running shared code (a single thread) on multiple CPUs would be very complicated in terms of organizing shared data.
+b) Chrome handles tabs as seperate processes instead of multiple threads within a single process (a single process being a Google Chrome browswer window), because if there was a failure processing a thread, it would not crash the entire browser (would not crash the entire process).
+==+== Answer 04
+a) As the number of threads exceeds the number of cores, and we start implementing concurrency on each core, the exeuction time will slow down. This is because the threads are now forced to be processed in a round robin fashion on each core.
+b) A process is address space + threads, where threads are the set of instructions to be processed by the CPU. Therefore, this might speed up the processing time due to the common data within a process for the threads to share in a process, but it would not speed up the processing time on the CPUs necessarily. 
+==+== Answer 05
+a) When creating a destination directory using the mkdir system call, there was no issue using the mode of the source directory even if the source directory was read only.
+b) When creating a destination file using the creat system call there was an issue using the mode bits of the source file. If the source file was read only, you would not be able to write contents to the destination file. What I did was created the file using read, write, executable priviledges, wrote to it and then changed the permissions to match the source. 
+c) If you could provide some sample code for the harder sections of the labs (after one week (out of the two weeks that are given for the assignment)).
