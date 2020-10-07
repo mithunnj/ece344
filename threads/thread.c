@@ -45,11 +45,13 @@ thread_init(void)
             thread_queue[i].id = main_id;
             thread_queue[i].state = RUNNING;
             thread_queue[i].context = cur;
+
+            return;
         }
     }
 
-    return;
-
+    printf("Failure to thread_init()\n");
+    exit(EXIT_FAILURE);
 }
 
 int main() {
