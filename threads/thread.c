@@ -139,10 +139,12 @@ int main() {
     // Test that return is THREAD_NONE
     ret = thread_yield(THREAD_ANY);
     assert(ret == THREAD_NONE);
+    printf("Test 1: return THREAD_NONE passed!");
 
     // Test return is 0
     ret = thread_yield(THREAD_SELF);
     assert(ret == 0);
+    printf("Test 2: return THREAD_SELF passed!");
 
     return 0;
 }
