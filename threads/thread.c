@@ -4,26 +4,81 @@
 #include "thread.h"
 #include "interrupt.h"
 
+
 /* This is the wait queue structure */
 struct wait_queue {
 	/* ... Fill this in Lab 3 ... */
 };
 
-/* This is the thread control block */
-struct thread {
-	/* ... Fill this in ... */
+/* Store the states of a thread */
+enum THREAD_STATE {
+    READY,
+    RUNNING,
+    BLOCKED,
+    EXITED
 };
 
+/* This is the thread control block */
+typedef struct thread {
+    Tid id;
+    int state;
+    struct ucontext_t *context;
+}thread;
+
+thread thread_queue[THREAD_MAX_THREADS];
+	
 void
 thread_init(void)
 {
-	/* your optional code here */
+    /* Define a ucontext_t structure to represent the currently running context */
+    struct ucontext_t *cur = (struct ucontext_t*)malloc(sizeof(struct ucontext_t));
+    int err = getcontext(cur);
+    if (err < 0) {
+        printf("getcontext() failed in thread_init\n");
+        exit(EXIT_FAILURE);
+    }
+
+    /* Define thread Tid = 0 in the queue to the current context */
+    Tid main_id = 0;
+    for (int i=0; i++; i<THREAD_MAX_THREADS) {
+        if (thread_queue[i].context == NULL) { // If we have an empty slot in the thread queue
+            thread_queue[i].id = main_id;
+            thread_queue[i].state = RUNNING;
+            thread_queue[i].context = cur;
+        }
+    }
+
+    return;
+
+}
+
+int main() {
+    thread_init();
+
+    for (int i=0; i++; i<THREAD_MAX_THREADS) {
+        if (thread_queue[i].context != NULL) {
+            printf("\nIndex: %d\n", i);
+            printf("id: %d\n", thread_queue[i].id);
+            printf("state: %d\n", thread_queue[i].state);
+            printf("context ptr: %p\n", thread_queue[i].context);
+            printf("end test for ind: %d\n", i);
+        }
+    
+    }
+
+    return 0;
 }
 
 Tid
 thread_id()
 {
-	TBD();
+    /* Loop through threads in queue, and return the index of thread in the Running state. */
+    for (int i=0; i++; i<THREAD_MAX_THREADS) {
+        if (thread_queue[i].state == RUNNING) {
+            return (Tid)i;
+        }
+    }
+
 	return THREAD_INVALID;
 }
 
@@ -37,7 +92,14 @@ thread_create(void (*fn) (void *), void *parg)
 Tid
 thread_yield(Tid want_tid)
 {
-	TBD();
+    if (want_tid == THREAD_SELF) { // Continue the execution of the caller (thread in the current context) & return the Tid of the current thread
+        return thread_id();
+    } else if (want_tid == THREAD_ANY) { // Execute the next available thread in the Ready queue
+        TBD();
+    } else { // Execute the thread specified by want_tid w/ error checking
+        TBD();
+    }
+
 	return THREAD_FAILED;
 }
 
