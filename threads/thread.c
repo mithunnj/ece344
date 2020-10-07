@@ -4,6 +4,8 @@
 #include "thread.h"
 #include "interrupt.h"
 
+#define EMPTY_ID -1
+
 
 /* This is the wait queue structure */
 struct wait_queue {
@@ -12,6 +14,7 @@ struct wait_queue {
 
 /* Store the states of a thread */
 enum THREAD_STATE {
+    EMPTY,
     READY,
     RUNNING,
     BLOCKED,
@@ -23,13 +26,20 @@ typedef struct thread {
     Tid id;
     int state;
     struct ucontext_t *context;
-}thread;
+} thread;
 
 thread thread_queue[THREAD_MAX_THREADS];
 	
 void
 thread_init(void)
 {
+    /* Initialize thread queue element to default values */
+    for (int i=0; i<THREAD_MAX_THREADS; i++) {
+        thread_queue[i].id = EMPTY_ID;
+        thread_queue[i].state = EMPTY;
+        thread_queue[i].context = NULL;
+    }
+
     /* Define a ucontext_t structure to represent the currently running context */
     struct ucontext_t *cur = (struct ucontext_t*)malloc(sizeof(struct ucontext_t));
     int err = getcontext(cur);
@@ -39,19 +49,11 @@ thread_init(void)
     }
 
     /* Define thread Tid = 0 in the queue to the current context */
-    Tid main_id = 0;
-    for (int i=0; i<THREAD_MAX_THREADS; i++) {
-        if (thread_queue[i].context == NULL) { // If we have an empty slot in the thread queue
-            thread_queue[i].id = main_id;
-            thread_queue[i].state = RUNNING;
-            thread_queue[i].context = cur;
+    thread_queue[0].id = (Tid)0;
+    thread_queue[0].state = RUNNING;
+    thread_queue[0].context = cur;
 
-            return;
-        }
-    }
-
-    printf("Failure to thread_init()\n");
-    exit(EXIT_FAILURE);
+    return thread_queue[0].id;
 }
 
 
@@ -79,10 +81,47 @@ thread_create(void (*fn) (void *), void *parg)
 Tid
 thread_yield(Tid want_tid)
 {
+    int ret;
+
     if (want_tid == THREAD_SELF) { // Continue the execution of the caller (thread in the current context) & return the Tid of the current thread
         return thread_id();
+
     } else if (want_tid == THREAD_ANY) { // Execute the next available thread in the Ready queue
-        TBD();
+
+        int next_id = EMPTY_ID;
+        int curr_id = (int)thread_id(); // Placeholder to store the current thread's ID
+
+        // Determine index/threadID of next available READY state thread
+        for (int i; i<THREAD_MAX_THREADS; i++) {
+            if (thread_queue[i].state == READY) {
+                // Validate that index and ID match
+                if (thread_queue[i].id != (Tid)i) {
+                    printf("Thread ID and index failure in thread_yield\n");
+                    exit(EXIT_FAILURE);
+                }
+                next_id = i;
+            }
+        }
+
+        // Check status of READY thread
+        if (next_id == EMPTY_ID) {
+            return THREAD_NONE;
+        } else {
+
+            // Set current thread into Ready state
+            getcontext(thread_queue[curr_id].context); // Update context information for this thread
+            thread_queue[curr_id].state = READY;
+
+            // Set the next thread into Run state
+            thread_queue[next_id].state = RUNNING;
+            ret = setcontext(thread_queue[curr_id].context);
+            if (ret < 0) {
+                return THREAD_INVALID;
+            }
+
+            return (Tid)next_id;
+        }
+
     } else { // Execute the thread specified by want_tid w/ error checking
         TBD();
     }
@@ -94,21 +133,16 @@ thread_yield(Tid want_tid)
 int main() {
     // Initialized thread
     thread_init();
-
-    for (int i=0; i<THREAD_MAX_THREADS; i++) {
-        if (thread_queue[i].context != NULL) {
-            printf("\nIndex: %d\n", i);
-            printf("id: %d\n", thread_queue[i].id);
-            printf("state: %d\n", thread_queue[i].state);
-            printf("context ptr: %p\n", thread_queue[i].context);
-            printf("end test for ind: %d\n", i);
-
-            Tid thread_val = thread_yield(THREAD_SELF);
-
-            printf("Return from thread_yield: Tid = %d\n", thread_val);
-        }
     
-    }
+    Tid ret;
+    
+    // Test that return is THREAD_NONE
+    ret = thread_yield(THREAD_ANY);
+    assert(ret == THREAD_NONE);
+
+    // Test return is 0
+    ret = thread_yield(THREAD_SELF);
+    assert(ret == 0);
 
     return 0;
 }
