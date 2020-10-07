@@ -103,7 +103,7 @@ int main() {
             printf("context ptr: %p\n", thread_queue[i].context);
             printf("end test for ind: %d\n", i);
 
-            Tid thread_val = thread_yield(thread_queue[i].id);
+            Tid thread_val = thread_yield(THREAD_SELF);
 
             printf("Return from thread_yield: Tid = %d\n", thread_val);
         }
