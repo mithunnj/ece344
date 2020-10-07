@@ -53,7 +53,7 @@ thread_init(void)
     thread_queue[0].state = RUNNING;
     thread_queue[0].context = cur;
 
-    return thread_queue[0].id;
+    return;
 }
 
 
