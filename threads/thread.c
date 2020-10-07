@@ -54,22 +54,7 @@ thread_init(void)
     exit(EXIT_FAILURE);
 }
 
-int main() {
-    thread_init();
 
-    for (int i=0; i<THREAD_MAX_THREADS; i++) {
-        if (thread_queue[i].context != NULL) {
-            printf("\nIndex: %d\n", i);
-            printf("id: %d\n", thread_queue[i].id);
-            printf("state: %d\n", thread_queue[i].state);
-            printf("context ptr: %p\n", thread_queue[i].context);
-            printf("end test for ind: %d\n", i);
-        }
-    
-    }
-
-    return 0;
-}
 
 Tid
 thread_id()
@@ -103,6 +88,29 @@ thread_yield(Tid want_tid)
     }
 
 	return THREAD_FAILED;
+}
+
+// DEBUG REMOVE - Used for testing the code base during development.
+int main() {
+    // Initialized thread
+    thread_init();
+
+    for (int i=0; i<THREAD_MAX_THREADS; i++) {
+        if (thread_queue[i].context != NULL) {
+            printf("\nIndex: %d\n", i);
+            printf("id: %d\n", thread_queue[i].id);
+            printf("state: %d\n", thread_queue[i].state);
+            printf("context ptr: %p\n", thread_queue[i].context);
+            printf("end test for ind: %d\n", i);
+
+            Tid thread_val = thread_yield(thread_queue[i].id);
+
+            printf("Return from thread_yield: Tid = %d\n", thread_val);
+        }
+    
+    }
+
+    return 0;
 }
 
 void
