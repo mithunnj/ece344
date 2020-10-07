@@ -56,8 +56,6 @@ thread_init(void)
     return;
 }
 
-
-
 Tid
 thread_id()
 {
@@ -129,7 +127,7 @@ thread_yield(Tid want_tid)
 	return THREAD_FAILED;
 }
 
-// DEBUG REMOVE - Used for testing the code base during development.
+/* // DEBUG REMOVE - Used for testing the code base during development.
 int main() {
     // Initialized thread
     thread_init();
@@ -148,7 +146,7 @@ int main() {
 
     return 0;
 }
-
+ */
 void
 thread_exit()
 {
