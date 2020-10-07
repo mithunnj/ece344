@@ -40,7 +40,7 @@ thread_init(void)
 
     /* Define thread Tid = 0 in the queue to the current context */
     Tid main_id = 0;
-    for (int i=0; i++; i<THREAD_MAX_THREADS) {
+    for (int i=0; i<THREAD_MAX_THREADS; i++) {
         if (thread_queue[i].context == NULL) { // If we have an empty slot in the thread queue
             thread_queue[i].id = main_id;
             thread_queue[i].state = RUNNING;
@@ -55,7 +55,7 @@ thread_init(void)
 int main() {
     thread_init();
 
-    for (int i=0; i++; i<THREAD_MAX_THREADS) {
+    for (int i=0; i<THREAD_MAX_THREADS; i++) {
         if (thread_queue[i].context != NULL) {
             printf("\nIndex: %d\n", i);
             printf("id: %d\n", thread_queue[i].id);
@@ -73,7 +73,7 @@ Tid
 thread_id()
 {
     /* Loop through threads in queue, and return the index of thread in the Running state. */
-    for (int i=0; i++; i<THREAD_MAX_THREADS) {
+    for (int i=0; i<THREAD_MAX_THREADS; i++) {
         if (thread_queue[i].state == RUNNING) {
             return (Tid)i;
         }
