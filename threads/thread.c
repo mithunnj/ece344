@@ -29,6 +29,18 @@ typedef struct thread {
 } thread;
 
 thread thread_queue[THREAD_MAX_THREADS];
+
+/* thread starts by calling thread_stub. The arguments to thread_stub are the
+ * thread_main() function, and one argument to the thread_main() function. 
+ * NOTE: This still needs to be changed. */
+void
+thread_stub(void (*thread_main)(void *), void *arg)
+{
+	Tid ret;
+
+	thread_main(arg); // call thread_main() function with arg
+	thread_exit();
+}
 	
 void
 thread_init(void)
