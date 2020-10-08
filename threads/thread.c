@@ -150,7 +150,6 @@ thread_yield(Tid want_tid)
         } else {
 
             // Set current thread into Ready state
-            setcontext_called = 1;
             getcontext(thread_queue[curr_id].context); // Update context information for this thread
             // If thread returns to this point, and setcontext_called has been run return next_id
             if (setcontext_called == 1) {
@@ -161,6 +160,7 @@ thread_yield(Tid want_tid)
 
             // Set the next thread into Run state
             thread_queue[next_id].state = RUNNING;
+            setcontext_called = 1;
             ret = setcontext(thread_queue[next_id].context);
             if (ret < 0) {
                 return THREAD_INVALID;
@@ -182,7 +182,6 @@ thread_yield(Tid want_tid)
             }
 
             // Set current thread into Ready state
-            setcontext_called = 1;
             getcontext(thread_queue[curr_id].context); // Update context information for this thread
             // If thread returns to this point, and setcontext_called has been run return next_id
             if (setcontext_called == 1) {
@@ -194,6 +193,7 @@ thread_yield(Tid want_tid)
             // Set the next thread into Run state
             thread_queue[want_tid].state = RUNNING;
             printf("DEBUG: About to switch context\n"); //DEBUG REMOVE
+            setcontext_called = 1;
             ret = setcontext(thread_queue[want_tid].context);
             if (ret < 0) {
                 return THREAD_INVALID;
