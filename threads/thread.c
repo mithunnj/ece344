@@ -96,7 +96,7 @@ thread_create(void (*fn) (void *), void *parg)
     assert(new_id != EMPTY_ID);
 
     // Copy context of current thread, and assign that to the new thread context
-    struct ucontext_t *cur;
+    struct ucontext_t *cur = NULL;
     int err = getcontext(cur);
     assert(err == 0);
 
@@ -111,7 +111,7 @@ thread_create(void (*fn) (void *), void *parg)
     printf("\nDEBUG STATEMENTS: \n");
     printf("ucontext_t cur ptr: %p\n", cur);
     printf("stack ptr: %p\n", cur->uc_stack.ss_sp);
-    printf("stack size: %d\n", cur->uc_stack.ss_size);
+    printf("stack size: %ld\n", (long)cur->uc_stack.ss_size);
     exit(1);
 
     // DEBUG: Test out the code
