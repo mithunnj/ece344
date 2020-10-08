@@ -267,7 +267,7 @@ thread_kill(Tid tid)
     // Ensure that requested thread is in the Finished state. If so free and reset state to Empty.
     if (thread_queue[tid].state == FINISHED) {
         free(thread_queue[tid].context); // Free the context and stack information
-        thread_queue[tid].state == EMPTY;
+        thread_queue[tid].state = EMPTY;
     } else {
         return THREAD_INVALID;
     }
