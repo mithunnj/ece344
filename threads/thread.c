@@ -136,7 +136,7 @@ int main() {
     thread_init();
 
     int ret = thread_create((void (*)(void *))hello, "hello from first thread");
-    ret = thread_yield(ret);
+    ret = thread_yield(THREAD_ANY);
 
     printf("DEBUG: Return from thread_Create in main(): %d\n", ret);
 
