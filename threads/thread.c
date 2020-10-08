@@ -120,7 +120,90 @@ thread_create(void (*fn) (void *), void *parg)
 	return thread_queue[new_id].id;
 }
 
-/* // DEBUG REMOVE function below
+
+
+Tid
+thread_yield(Tid want_tid)
+{
+    int ret;
+    volatile int setcontext_called = 0;
+    int curr_id = (int)thread_id(); // Placeholder to store the current thread's ID
+
+    if (want_tid == THREAD_SELF || want_tid == MAIN_THREAD_ID) { // Continue the execution of the caller (thread in the current context) & return the Tid of the current thread
+        return thread_id();
+    
+    } else if (want_tid == THREAD_ANY) { // Execute the next available thread in the Ready queue
+
+        int next_id = EMPTY_ID;
+
+        // Determine index/threadID of next available READY state thread
+        for (int i=0; i<THREAD_MAX_THREADS; i++) {
+            if (thread_queue[i].state == READY) {
+                next_id = i;
+                break;
+            }
+        }
+
+        // Check status of READY thread
+        if (next_id == EMPTY_ID) {
+            return THREAD_NONE;
+        } else {
+
+            // Set current thread into Ready state
+            setcontext_called = 1;
+            getcontext(thread_queue[curr_id].context); // Update context information for this thread
+            // If thread returns to this point, and setcontext_called has been run return next_id
+            if (setcontext_called == 1) {
+                return (Tid)next_id;
+            }
+
+            thread_queue[curr_id].state = READY;
+
+            // Set the next thread into Run state
+            thread_queue[next_id].state = RUNNING;
+            ret = setcontext(thread_queue[next_id].context);
+            if (ret < 0) {
+                return THREAD_INVALID;
+            }
+
+            return (Tid)next_id;
+        }
+
+    } else { // Execute the thread specified by want_tid w/ error checking
+        if (want_tid < 0 || want_tid >= THREAD_MAX_THREADS) {
+            return THREAD_INVALID;
+        } else {
+
+            // Validate requested Tid
+            if (thread_queue[want_tid].state != READY) {
+                return THREAD_INVALID;
+            }
+
+            // Set current thread into Ready state
+            setcontext_called = 1;
+            getcontext(thread_queue[curr_id].context); // Update context information for this thread
+            // If thread returns to this point, and setcontext_called has been run return next_id
+            if (setcontext_called == 1) {
+                return want_tid;
+            }
+
+            thread_queue[curr_id].state = READY;
+
+            // Set the next thread into Run state
+            thread_queue[want_tid].state = RUNNING;
+            ret = setcontext(thread_queue[want_tid].context);
+            if (ret < 0) {
+                return THREAD_INVALID;
+            }
+
+            return want_tid;
+        }
+    }
+
+	return THREAD_FAILED;
+}
+
+// DEBUG REMOVE function below
 static void
 hello(char *msg)
 {
@@ -141,58 +224,6 @@ int main() {
     printf("DEBUG: Return from thread_Create in main(): %d\n", ret);
 
     return 0;
-}
- */
-
-Tid
-thread_yield(Tid want_tid)
-{
-    int ret;
-
-    if (want_tid == THREAD_SELF || want_tid == MAIN_THREAD_ID) { // Continue the execution of the caller (thread in the current context) & return the Tid of the current thread
-        return thread_id();
-    
-    } else if (want_tid == THREAD_ANY) { // Execute the next available thread in the Ready queue
-
-        int next_id = EMPTY_ID;
-        int curr_id = (int)thread_id(); // Placeholder to store the current thread's ID
-
-        // Determine index/threadID of next available READY state thread
-        for (int i=0; i<THREAD_MAX_THREADS; i++) {
-            if (thread_queue[i].state == READY) {
-                next_id = i;
-                break;
-            }
-        }
-
-        // Check status of READY thread
-        if (next_id == EMPTY_ID) {
-            return THREAD_NONE;
-        } else {
-
-            // Set current thread into Ready state
-            getcontext(thread_queue[curr_id].context); // Update context information for this thread
-            thread_queue[curr_id].state = READY;
-
-            // Set the next thread into Run state
-            thread_queue[next_id].state = RUNNING;
-            ret = setcontext(thread_queue[curr_id].context);
-            if (ret < 0) {
-                return THREAD_INVALID;
-            }
-
-            return (Tid)next_id;
-        }
-
-    } else { // Execute the thread specified by want_tid w/ error checking
-        if (want_tid < 0 || want_tid >= THREAD_MAX_THREADS) {
-            return THREAD_INVALID;
-        } else {
-            TBD();
-        }
-    }
-
-	return THREAD_FAILED;
 }
 
 
