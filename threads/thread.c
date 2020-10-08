@@ -93,11 +93,7 @@ thread_yield(Tid want_tid)
 {
     int ret;
 
-    printf("\nDEBUG: want_id = %d\n", want_tid); //DEBUG REMOVE
-
-    if (want_tid < 0 || want_tid >= THREAD_MAX_THREADS) {
-        return THREAD_INVALID;
-    } else if (want_tid == THREAD_SELF || want_tid == MAIN_THREAD_ID) { // Continue the execution of the caller (thread in the current context) & return the Tid of the current thread
+    if (want_tid == THREAD_SELF || want_tid == MAIN_THREAD_ID) { // Continue the execution of the caller (thread in the current context) & return the Tid of the current thread
         return thread_id();
 
     } else if (want_tid == THREAD_ANY) { // Execute the next available thread in the Ready queue
@@ -137,8 +133,11 @@ thread_yield(Tid want_tid)
         }
 
     } else { // Execute the thread specified by want_tid w/ error checking
-        TBD();
-    }
+        if (want_tid < 0 || want_tid >= THREAD_MAX_THREADS) {
+            return THREAD_INVALID;
+        } else {
+            TBD();
+        }
 
 	return THREAD_FAILED;
 }
