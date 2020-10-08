@@ -101,27 +101,20 @@ thread_create(void (*fn) (void *), void *parg)
     int err = getcontext(thread_queue[new_id].context);
     assert(err == 0);
 
-    // #NOTE: You should probably stop here and check if the program is functioning properly at this point
-    // and check the return of getcontext and see if it changed the cur context variable.
-
     // Define the parameters for the stack 
     thread_queue[new_id].context->uc_stack.ss_sp = (void *)malloc(sizeof(THREAD_MIN_STACK));
     thread_queue[new_id].context->uc_stack.ss_size = sizeof(thread_queue[new_id].context->uc_stack.ss_sp);
 
-    // DEBUG REMOVE
-    printf("\nDEBUG STATEMENTS: \n");
-    printf("ucontext_t cur ptr: %p\n", thread_queue[new_id].context);
-    printf("stack ptr: %p\n", thread_queue[new_id].context->uc_stack.ss_sp);
-    printf("stack size: %ld\n", (long)thread_queue[new_id].context->uc_stack.ss_size);
-    exit(1);
-
-    // DEBUG: Test out the code
-
-    // #NOTE: Left off here, but why don't you just change the stack parameters of cur directly.
+    // Setup uc_link - pointer to the context that will be resumed when this context returns
+    Tid cur_id = thread_id()
+    thread_queue[new_id].context->uc_link = thread_queue[cur_id].context;
 
     // Define the parameters of the new thread
     thread_queue[new_id].state = READY;
-
+    thread_queue[new_id].context.uc_mcontext.gregs[REG_RIP] = &thread_stub; // Instruction pointer for new thread should point to the stub function 
+    thread_queue[new_id].context.uc_mcontext.gregs[REG_RSP] = thread_queue[new_id].context->uc_stack.ss_sp; // Stack pointer should point to the end of the stack, stack grows downwards
+    thread_queue[new_id].context.uc_mcontext.gregs[REG_RDI] = fn; // Arg #1 for stub function
+    thread_queue[new_id].context.uc_mcontext.gregs[REG_RSI] = parg; // Arg #2 for stub function
 
 	return THREAD_FAILED;
 }
