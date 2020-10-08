@@ -18,7 +18,7 @@ enum THREAD_STATE {
     EMPTY,
     READY,
     RUNNING,
-    BLOCKED,
+    FINISHED,
     EXITED
 };
 
@@ -232,14 +232,47 @@ int main() {
 void
 thread_exit()
 {
-	TBD();
+    Tid next_tid = EMPTY_ID;
+
+    // Find the next thread to switch to
+    for (int i=0; i<THREAD_MAX_THREADS; i++) {
+        if (thread_queue[i].state == READY) {
+            next_tid = thread_queue[i].id;
+            break;
+        }
+    }
+
+    // Set the current thread to Finished state
+    Tid cur_tid = thread_id();
+    thread_queue[cur_tid].state = FINISHED;
+
+    // If there is a thread in the Ready queue run it, otherwise kill the current thread.
+    if (next_tid != EMPTY_ID) {
+        setcontext(thread_queue[next_tid].context);
+    } else {
+        thread_yield(THREAD_ANY);
+    }
+
+    return;
 }
 
 Tid
 thread_kill(Tid tid)
 {
-	TBD();
-	return THREAD_FAILED;
+    // Validate Tid request
+    if (tid < 0 || tid == thread_id()) {
+        return THREAD_INVALID;
+    }
+
+    // Ensure that requested thread is in the Finished state. If so free and reset state to Empty.
+    if (thread_queue[tid].state == FINISHED) {
+        free(thread_queue[tid].context); // Free the context and stack information
+        thread_queue[tid].state == EMPTY;
+    } else {
+        return THREAD_INVALID;
+    }
+
+	return tid;
 }
 
 /*******************************************************************
