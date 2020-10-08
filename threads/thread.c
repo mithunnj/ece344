@@ -160,13 +160,9 @@ thread_yield(Tid want_tid)
         // Determine index/threadID of next available READY state thread
         for (int i; i<THREAD_MAX_THREADS; i++) {
             if (thread_queue[i].state == READY) {
-                // Validate that index and ID match
-                if (thread_queue[i].id != (Tid)i) {
-                    printf("Thread ID and index failure in thread_yield\n");
-                    exit(EXIT_FAILURE);
-                }
                 next_id = i;
                 break;
+                }
             }
         }
 
