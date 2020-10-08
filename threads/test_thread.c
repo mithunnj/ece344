@@ -45,9 +45,6 @@ test_basic()
 	struct mallinfo minfo_start = mallinfo();
 
 	assert(thread_id() == 0);
-	printf("DEBUG: thread_info ret = %d\n", thread_id());
-
-	exit(1); // DEBUG REMOVE
 
 	/* Initial thread yields */
 	ret = thread_yield(THREAD_SELF);

@@ -5,6 +5,7 @@
 #include "interrupt.h"
 
 #define EMPTY_ID -1
+#define MAIN_THREAD_ID 0
 
 
 /* This is the wait queue structure */
@@ -60,7 +61,7 @@ thread_init(void)
     }
 
     /* Define thread Tid = 0 in the queue to the current context */
-    thread_queue[0].id = (Tid)0;
+    thread_queue[0].id = (Tid)MAIN_THREAD_ID;
     thread_queue[0].state = RUNNING;
     thread_queue[0].context = cur;
 
@@ -92,7 +93,9 @@ thread_yield(Tid want_tid)
 {
     int ret;
 
-    if (want_tid == THREAD_SELF) { // Continue the execution of the caller (thread in the current context) & return the Tid of the current thread
+    if (want_tid >= THREAD_MAX_THREADS) {
+        return THREAD_INVALID;
+    } else if (want_tid == THREAD_SELF || want_tid == MAIN_THREAD_ID) { // Continue the execution of the caller (thread in the current context) & return the Tid of the current thread
         return thread_id();
 
     } else if (want_tid == THREAD_ANY) { // Execute the next available thread in the Ready queue
