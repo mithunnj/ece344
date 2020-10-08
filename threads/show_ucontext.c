@@ -216,6 +216,7 @@ main(int argc, char **argv)
      * ANSWER: As described in the man pages, if successful (0) - setcontext() does not return. It will transfer control to the
      * context passed in (mycontext), and will continue execution from the point at which the context was stored in mycontext.
      * */
+	printf("DEBUG: Returned here after the setcontext() switch\n"); // DEBUG REMOVE
 	assert(0);
 }
 
