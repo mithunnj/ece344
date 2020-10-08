@@ -92,7 +92,6 @@ thread_create(void (*fn) (void *), void *parg)
         if (thread_queue[i].state == EMPTY) {
             new_id = (Tid)i;
             thread_queue[i].id = new_id;
-            thread_queue[i].state = READY;
         }
     }
     assert(new_id != EMPTY_ID);
@@ -121,8 +120,6 @@ thread_create(void (*fn) (void *), void *parg)
     // #NOTE: Left off here, but why don't you just change the stack parameters of cur directly.
 
     // Define the parameters of the new thread
-    thread_queue[new_id].id = new_id;
-    thread_queue[new_id].context = cur;
     thread_queue[new_id].state = READY;
 
 
