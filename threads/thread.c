@@ -192,13 +192,11 @@ thread_yield(Tid want_tid)
 
             // Set the next thread into Run state
             thread_queue[want_tid].state = RUNNING;
-            printf("DEBUG: About to switch context\n"); //DEBUG REMOVE
             setcontext_called = 1;
             ret = setcontext(thread_queue[want_tid].context);
             if (ret < 0) {
                 return THREAD_INVALID;
             }
-            printf("DEBUG: Finished switch context\n"); //DEBUG REMOVE
 
             return want_tid;
         }
@@ -207,7 +205,7 @@ thread_yield(Tid want_tid)
 	return THREAD_FAILED;
 }
 
-// DEBUG REMOVE function below
+/* // DEBUG REMOVE function below
 static void
 hello(char *msg)
 {
@@ -229,7 +227,7 @@ int main() {
 
     return 0;
 }
-
+ */
 
 void
 thread_exit()

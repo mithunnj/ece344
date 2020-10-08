@@ -209,7 +209,6 @@ void folder_copy(char *srcdir, char *dstdir) {
 				copy_file(update_src, update_dst);
 			}
 		}
-		printf("DEBUG: current directory is: %s\n", directory->d_name); // DEBUG REMOVE
 		directory = readdir(folder); // Move to the next file
 		
 		}
