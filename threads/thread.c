@@ -116,7 +116,7 @@ thread_create(void (*fn) (void *), void *parg)
     thread_queue[new_id].context->uc_mcontext.gregs[REG_RDI] = (long long int)fn; // Arg #1 for stub function
     thread_queue[new_id].context->uc_mcontext.gregs[REG_RSI] = (long long int)parg; // Arg #2 for stub function
 
-	return THREAD_FAILED;
+	return thread_queue[new_id].id;
 }
 
 // DEBUG REMOVE function below
