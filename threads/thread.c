@@ -160,6 +160,7 @@ thread_yield(Tid want_tid)
         // Determine index/threadID of next available READY state thread
         for (int i; i<THREAD_MAX_THREADS; i++) {
             if (thread_queue[i].state == READY) {
+                printf("DEBUG: Loop id: %d\n", i); // DEBUG REMOVE
                 next_id = i;
                 break;
             }
