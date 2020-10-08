@@ -162,7 +162,6 @@ thread_yield(Tid want_tid)
             if (thread_queue[i].state == READY) {
                 next_id = i;
                 break;
-                }
             }
         }
 
