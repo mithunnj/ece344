@@ -92,6 +92,7 @@ thread_create(void (*fn) (void *), void *parg)
         if (thread_queue[i].state == EMPTY) {
             new_id = (Tid)i;
             thread_queue[i].id = new_id;
+            break;
         }
     }
     assert(new_id != EMPTY_ID);
