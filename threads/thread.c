@@ -91,27 +91,29 @@ thread_create(void (*fn) (void *), void *parg)
     for (int i=1; i<THREAD_MAX_THREADS; i++) {
         if (thread_queue[i].state == EMPTY) {
             new_id = (Tid)i;
+            thread_queue[i].id = new_id;
+            thread_queue[i].state = READY;
         }
     }
     assert(new_id != EMPTY_ID);
 
     // Copy context of current thread, and assign that to the new thread context
-    struct ucontext_t *cur = NULL;
-    int err = getcontext(cur);
+    thread_queue[new_id].context = (struct ucontext_t*)malloc(sizeof(struct ucontext_t));
+    int err = getcontext(thread_queue[new_id].context);
     assert(err == 0);
 
     // #NOTE: You should probably stop here and check if the program is functioning properly at this point
     // and check the return of getcontext and see if it changed the cur context variable.
 
     // Define the parameters for the stack 
-    cur->uc_stack.ss_sp = (void *)malloc(sizeof(THREAD_MIN_STACK));
-    cur->uc_stack.ss_size = sizeof(cur->uc_stack.ss_sp);
+    thread_queue[new_id].context->uc_stack.ss_sp = (void *)malloc(sizeof(THREAD_MIN_STACK));
+    thread_queue[new_id].context->uc_stack.ss_size = sizeof(thread_queue[new_id].context->uc_stack.ss_sp);
 
     // DEBUG REMOVE
     printf("\nDEBUG STATEMENTS: \n");
-    printf("ucontext_t cur ptr: %p\n", cur);
-    printf("stack ptr: %p\n", cur->uc_stack.ss_sp);
-    printf("stack size: %ld\n", (long)cur->uc_stack.ss_size);
+    printf("ucontext_t cur ptr: %p\n", thread_queue[new_id].context);
+    printf("stack ptr: %p\n", thread_queue[new_id].context->uc_stack.ss_sp);
+    printf("stack size: %ld\n", (long)thread_queue[new_id].context->uc_stack.ss_size);
     exit(1);
 
     // DEBUG: Test out the code
