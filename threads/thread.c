@@ -36,7 +36,6 @@ thread thread_queue[THREAD_MAX_THREADS];
 void
 thread_stub(void (*thread_main)(void *), void *arg)
 {
-	Tid ret;
 
 	thread_main(arg); // call thread_main() function with arg
 	thread_exit();
