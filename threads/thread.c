@@ -174,6 +174,8 @@ thread_yield(Tid want_tid)
             return THREAD_INVALID;
         } else {
 
+            printf("DEBUG: Entered into the user requested want_tid section\n");
+
             // Validate requested Tid
             if (thread_queue[want_tid].state != READY) {
                 return THREAD_INVALID;
@@ -191,10 +193,12 @@ thread_yield(Tid want_tid)
 
             // Set the next thread into Run state
             thread_queue[want_tid].state = RUNNING;
+            printf("DEBUG: About to switch context\n"); //DEBUG REMOVE
             ret = setcontext(thread_queue[want_tid].context);
             if (ret < 0) {
                 return THREAD_INVALID;
             }
+            printf("DEBUG: Finished switch context\n"); //DEBUG REMOVE
 
             return want_tid;
         }
@@ -219,7 +223,7 @@ int main() {
     thread_init();
 
     int ret = thread_create((void (*)(void *))hello, "hello from first thread");
-    ret = thread_yield(THREAD_ANY);
+    ret = thread_yield(1);
 
     printf("DEBUG: Return from thread_Create in main(): %d\n", ret);
 
