@@ -40,6 +40,8 @@ thread_stub(void (*thread_main)(void *), void *arg)
 
 	thread_main(arg); // call thread_main() function with arg
 	thread_exit();
+
+    return;
 }
 	
 void
@@ -84,9 +86,67 @@ thread_id()
 Tid
 thread_create(void (*fn) (void *), void *parg)
 {
-	TBD();
+    Tid new_id = EMPTY_ID;
+    // Generate ID for new thread w/ error checking
+    for (int i=1; i<THREAD_MAX_THREADS; i++) {
+        if (thread_queue[i].state == EMPTY) {
+            new_id = (Tid)i;
+        }
+    }
+    assert(new_id != EMPTY_ID);
+
+    // Copy context of current thread, and assign that to the new thread context
+    struct ucontext_t *cur;
+    int err = getcontext(cur);
+    assert(err == 0);
+
+    // #NOTE: You should probably stop here and check if the program is functioning properly at this point
+    // and check the return of getcontext and see if it changed the cur context variable.
+
+    // Define the parameters for the stack 
+    cur->uc_stack.ss_sp = (void *)malloc(sizeof(THREAD_MIN_STACK));
+    cur->uc_stack.ss_size = sizeof(cur->uc_stack.ss_sp);
+
+    // DEBUG REMOVE
+    printf("\nDEBUG STATEMENTS: \n");
+    printf("ucontext_t cur ptr: %p\n", cur);
+    printf("stack ptr: %p\n", cur->uc_stack.ss_sp);
+    printf("stack size: %d\n", cur->uc_stack.ss_size);
+    exit(1);
+
+    // DEBUG: Test out the code
+
+    // #NOTE: Left off here, but why don't you just change the stack parameters of cur directly.
+
+    // Define the parameters of the new thread
+    thread_queue[new_id].id = new_id;
+    thread_queue[new_id].context = cur;
+    thread_queue[new_id].state = READY;
+
+
 	return THREAD_FAILED;
 }
+
+// DEBUG REMOVE function below
+static void
+hello(char *msg)
+{
+	printf("%s\n", msg);
+
+    return;
+
+}
+
+// DEBUG REMOVE - Used for testing the code base during development.
+int main() {
+    // Initialized thread
+    thread_init();
+
+    int ret = thread_create((void (*)(void *))hello, "hello from first thread");
+
+    return 0;
+}
+
 
 Tid
 thread_yield(Tid want_tid)
@@ -143,26 +203,7 @@ thread_yield(Tid want_tid)
 	return THREAD_FAILED;
 }
 
-/* // DEBUG REMOVE - Used for testing the code base during development.
-int main() {
-    // Initialized thread
-    thread_init();
-    
-    Tid ret;
-    
-    // Test that return is THREAD_NONE
-    ret = thread_yield(THREAD_ANY);
-    assert(ret == THREAD_NONE);
-    printf("Test 1: return THREAD_NONE passed!");
 
-    // Test return is 0
-    ret = thread_yield(THREAD_SELF);
-    assert(ret == 0);
-    printf("Test 2: return THREAD_SELF passed!");
-
-    return 0;
-}
- */
 void
 thread_exit()
 {
