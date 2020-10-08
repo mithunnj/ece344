@@ -95,7 +95,7 @@ thread_yield(Tid want_tid)
 
     if (want_tid == THREAD_SELF || want_tid == MAIN_THREAD_ID) { // Continue the execution of the caller (thread in the current context) & return the Tid of the current thread
         return thread_id();
-
+    
     } else if (want_tid == THREAD_ANY) { // Execute the next available thread in the Ready queue
 
         int next_id = EMPTY_ID;
@@ -138,6 +138,7 @@ thread_yield(Tid want_tid)
         } else {
             TBD();
         }
+    }
 
 	return THREAD_FAILED;
 }
