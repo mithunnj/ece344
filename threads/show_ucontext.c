@@ -223,6 +223,7 @@ main(int argc, char **argv)
 static void
 call_setcontext(ucontext_t * context)
 {
+	printf("DEBUG: Verify that change was implemented\n"); // DEBUG REMOVE
 	int err = setcontext(context);
 	assert(!err);
 }
