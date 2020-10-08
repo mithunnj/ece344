@@ -144,6 +144,8 @@ int main() {
 
     int ret = thread_create((void (*)(void *))hello, "hello from first thread");
 
+    printf("DEBUG: Return from thread_Create in main(): %d\n", ret);
+
     return 0;
 }
 
