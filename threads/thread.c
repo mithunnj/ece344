@@ -120,7 +120,7 @@ thread_create(void (*fn) (void *), void *parg)
 	return thread_queue[new_id].id;
 }
 
-// DEBUG REMOVE function below
+/* // DEBUG REMOVE function below
 static void
 hello(char *msg)
 {
@@ -142,7 +142,7 @@ int main() {
 
     return 0;
 }
-
+ */
 
 Tid
 thread_yield(Tid want_tid)
