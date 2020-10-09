@@ -3,6 +3,7 @@
 #include <ucontext.h>
 #include "thread.h"
 #include "interrupt.h"
+#include <inttypes.h>
 
 #define EMPTY_ID -1
 #define MAIN_THREAD_ID 0
@@ -26,6 +27,7 @@ enum THREAD_STATE {
 typedef struct thread {
     Tid id;
     int state;
+    struct ucontext_t *orig_malloc;
     struct ucontext_t *context;
 } thread;
 
@@ -52,6 +54,7 @@ thread_init(void)
         thread_queue[i].id = EMPTY_ID;
         thread_queue[i].state = EMPTY;
         thread_queue[i].context = NULL;
+        thread_queue[i].orig_malloc = NULL;
     }
 
     /* Define a ucontext_t structure to represent the currently running context */
@@ -95,7 +98,9 @@ thread_create(void (*fn) (void *), void *parg)
             break;
         }
     }
-    assert(new_id != EMPTY_ID);
+    if (new_id == EMPTY_ID) {
+        return THREAD_NOMORE;
+    }
 
     // Copy context of current thread, and assign that to the new thread context
     thread_queue[new_id].context = (struct ucontext_t*)malloc(sizeof(struct ucontext_t));
@@ -103,8 +108,15 @@ thread_create(void (*fn) (void *), void *parg)
     assert(err == 0);
 
     // Define the parameters for the stack 
-    thread_queue[new_id].context->uc_stack.ss_sp = (void *)malloc(sizeof(THREAD_MIN_STACK));
-    thread_queue[new_id].context->uc_stack.ss_size = sizeof(thread_queue[new_id].context->uc_stack.ss_sp);
+    thread_queue[new_id].orig_malloc = (void *)malloc(sizeof(THREAD_MIN_STACK + 15));
+    if (thread_queue[new_id].orig_malloc == NULL) {
+        return THREAD_NOMEMORY;
+    }
+    // Align stack to 16 bytes  
+    struct ucontext_t *aligned_ptr = (struct ucontext_t*)(((uintptr_t)thread_queue[new_id].orig_malloc+15) & ~ (uintptr_t)0x0F);
+    unsigned long shift = abs(aligned_ptr - thread_queue[new_id].orig_malloc);
+    thread_queue[new_id].context->uc_stack.ss_sp = aligned_ptr;
+    thread_queue[new_id].context->uc_stack.ss_size = THREAD_MIN_STACK + 15 - shift;
 
     // Setup uc_link - pointer to the context that will be resumed when this context returns
     Tid cur_id = thread_id();
@@ -174,8 +186,6 @@ thread_yield(Tid want_tid)
             return THREAD_INVALID;
         } else {
 
-            printf("DEBUG: Entered into the user requested want_tid section\n");
-
             // Validate requested Tid
             if (thread_queue[want_tid].state != READY) {
                 return THREAD_INVALID;
@@ -205,30 +215,6 @@ thread_yield(Tid want_tid)
 	return THREAD_FAILED;
 }
 
-/* // DEBUG REMOVE function below
-static void
-hello(char *msg)
-{
-	printf("%s\n", msg);
-
-    return;
-
-}
-
-// DEBUG REMOVE - Used for testing the code base during development.
-int main() {
-    // Initialized thread
-    thread_init();
-
-    int ret = thread_create((void (*)(void *))hello, "hello from first thread");
-    ret = thread_yield(1);
-
-    printf("DEBUG: Return from thread_Create in main(): %d\n", ret);
-
-    return 0;
-}
- */
-
 void
 thread_exit()
 {
@@ -248,7 +234,7 @@ thread_exit()
 
     // If there is a thread in the Ready queue run it, otherwise kill the current thread.
     if (next_tid != EMPTY_ID) {
-        setcontext(thread_queue[next_tid].context);
+        thread_yield(next_tid);
     } else {
         thread_yield(THREAD_ANY);
     }
@@ -266,8 +252,10 @@ thread_kill(Tid tid)
 
     // Ensure that requested thread is in the Finished state. If so free and reset state to Empty.
     if (thread_queue[tid].state == FINISHED) {
-        free(thread_queue[tid].context); // Free the context and stack information
+        free(thread_queue[tid].orig_malloc); // Free the stack information
         thread_queue[tid].state = EMPTY;
+        thread_queue[tid].context = NULL;
+        thread_queue[tid].orig_malloc = NULL;
     } else {
         return THREAD_INVALID;
     }
